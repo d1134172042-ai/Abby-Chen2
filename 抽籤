@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>抽籤程式</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to bottom, #fef6e4, #fde2e4);
+      margin: 0;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 300px;
+      height: 150px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background-color: #ff7f50;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background-color: #ff6333;
+    }
+
+    #result {
+      margin-top: 30px;
+      font-size: 32px;
+      font-weight: bold;
+      color: #d62828;
+      min-height: 50px;
+    }
+
+    #hint {
+      color: #666;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 抽籤程式 🎉</h1>
+
+  <p>請輸入抽籤名單，一行一個名字：</p>
+  <textarea id="nameList" placeholder="例如：&#10;小明&#10;小華&#10;小美"></textarea>
+  <br>
+  <button onclick="drawLottery()">開始抽籤</button>
+
+  <div id="result"></div>
+  <div id="hint">抽籤前請先點一下頁面或按鈕，瀏覽器才會允許播放音效。</div>
+
+  <!-- 中獎音效 -->
+  <audio id="winSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    let isDrawing = false;
+
+    function drawLottery() {
+      if (isDrawing) return;
+
+      const text = document.getElementById("nameList").value.trim();
+      const result = document.getElementById("result");
+      const sound = document.getElementById("winSound");
+
+      const names = text
+        .split("\n")
+        .map(name => name.trim())
+        .filter(name => name !== "");
+
+      if (names.length === 0) {
+        result.textContent = "請先輸入名單！";
+        return;
+      }
+
+      isDrawing = true;
+      let count = 0;
+      const flashTimes = 20;
+
+      const interval = setInterval(() => {
+        const randomName = names[Math.floor(Math.random() * names.length)];
+        result.textContent = "抽籤中... " + randomName;
+        count++;
+
+        if (count >= flashTimes) {
+          clearInterval(interval);
+          const winner = names[Math.floor(Math.random() * names.length)];
+          result.textContent = "恭喜中獎者：🎊 " + winner + " 🎊";
+
+          sound.currentTime = 0;
+          sound.play().catch(err => {
+            console.log("音效播放失敗：", err);
+          });
+
+          isDrawing = false;
+        }
+      }, 100);
+    }
+  </script>
+</body>
+</html>
